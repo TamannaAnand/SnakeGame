@@ -6,7 +6,6 @@ import os
 # Define program constants
 WIDTH = 800
 HEIGHT = 600
-DELAY = 100  # Milliseconds
 FOOD_SIZE = 32
 SNAKE_SIZE = 20
 
@@ -22,6 +21,7 @@ offsets = {
 
 # high score
 high_score = 0
+delay = 200  # Initial delay in milliseconds
 
 # load high score if it exists 
 try:
@@ -36,6 +36,16 @@ def update_high_score():
         high_score = score
         with open("high_score.txt", "w") as file:
             file.write(str(high_score))
+
+# decrease delay if score is greater than 5 
+def decrease_delay():
+    global delay
+    if score > 5:
+        delay = 100  # Decrease delay to 500ms
+    elif score > 10:
+        delay = 80
+    elif score > 15:
+        delay = 60
 
 def register_shapes():
     # Register custom shapes from the images
@@ -122,15 +132,16 @@ def game_loop():
         screen.update()
 
         # Rinse and repeat
-        turtle.ontimer(game_loop, DELAY)
+        turtle.ontimer(game_loop, delay)
 
 def food_collision():
     global food_pos, score
     if get_distance(snake[-1], food_pos) < 20:
-        score += 1  # score = score + 1
+        score += 1  # score = score + 1 
         update_high_score()  # Update high score if necessary
         food_pos = get_random_food_pos()
         food.goto(food_pos)
+        decrease_delay()  # Decrease delay if score is greater than 5
         return True
     return False
 
